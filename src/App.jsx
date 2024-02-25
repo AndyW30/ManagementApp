@@ -8,7 +8,35 @@ function App() {
   const [display, setDisplay] = useState({
     selectedProjectId: undefined,
     projects: [],
+    task: [],
   });
+
+  const handleAddTask = (text) => {
+    setDisplay((prevState) => {
+      const taskId = Math.random();
+      const newTask = {
+        text: text,
+        projectId: prevState.selectedProjectId,
+        id: taskId,
+      };
+      return {
+        ...prevState,
+        selectedProjectId: prevState.selectedProjectId,
+        task: [newTask, ...prevState.task],
+      };
+    });
+  };
+
+  const handleDeleteTask = (id) => {
+    setDisplay((prevState) => {
+      return {
+        ...prevState,
+        task: prevState.task.filter(
+          (task) => task.id !== id,
+        ),
+      };
+    });
+  };
 
   const handleSelectProject = (id) => {
     setDisplay((prevState) => {
@@ -55,21 +83,31 @@ function App() {
     });
   };
 
-const handleDelete = () => {
-  setDisplay((prevState) => {
-    return {
-      ...prevState,
-      selectedProjectId: undefined,
-      projects: prevState.projects.filter((project)=>project.id !== prevState.selectedProjectId)
-    };
-  });
-}
+  const handleDelete = () => {
+    setDisplay((prevState) => {
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        projects: prevState.projects.filter(
+          (project) => project.id !== prevState.selectedProjectId,
+        ),
+      };
+    });
+  };
 
   const selectedProject = display.projects.find(
     (project) => project.id === display.selectedProjectId,
   );
 
-  let content = <SelectedProject project={selectedProject} onDelete = {handleDelete} />;
+  let content = (
+    <SelectedProject
+      project={selectedProject}
+      onDelete={handleDelete}
+      onAddTask={handleAddTask}
+      onDeleteTask={handleDeleteTask}
+      tasks={display.task}
+    />
+  );
   if (display.selectedProjectId === null) {
     content = <NewProject onAdd={handleAddProject} cancel={handleCancel} />;
   } else if (display.selectedProjectId === undefined) {
@@ -82,6 +120,7 @@ const handleDelete = () => {
         onStartAddProject={handleProject}
         projects={display.projects}
         onSelectProject={handleSelectProject}
+        selectedProjectId={display.selectedProjectId}
       />
       {content}
     </main>
